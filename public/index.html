@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0" />
+  <meta name="theme-color" content="#6366f1" />
+  <title>맞춰 · Matchu</title>
+  <link rel="manifest" href="/manifest.json" />
+  <link rel="icon" type="image/svg+xml" href="/icon.svg" />
+  <link rel="apple-touch-icon" href="/icon.svg" />
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <div class="app">
+
+    <!-- 헤더 -->
+    <header class="app-header">
+      <div class="brand" id="brandHome">
+        <span class="brand-logo">✦</span>
+        <span class="brand-name">맞춰</span>
+        <span class="brand-tag">Matchu</span>
+      </div>
+      <div class="header-actions">
+        <span id="wsStatus" class="ws-status" title="실시간 연결 상태"></span>
+        <button id="notifyToggle" class="icon-btn" title="알림 켜기">🔔</button>
+        <button id="themeToggle" class="icon-btn" title="다크/라이트 모드 전환">🌙</button>
+      </div>
+    </header>
+
+    <!-- ========== 닉네임 화면 ========== -->
+    <section id="nicknameScreen" class="screen active">
+      <div class="hero">
+        <h1 class="hero-title">함께 비는 그 날을<br/>한눈에 맞춰보세요</h1>
+        <p class="hero-subtitle">친구·동료와 약속 날짜·시간을 모으고, 채팅으로 의견까지</p>
+      </div>
+      <div class="card glass">
+        <div class="field">
+          <label for="nicknameInput">닉네임</label>
+          <input id="nicknameInput" type="text" placeholder="예: 길동" autocomplete="off" maxlength="20" />
+        </div>
+        <button id="enterLobbyBtn" class="primary-btn">시작하기</button>
+        <p id="nicknameMsg" class="msg"></p>
+      </div>
+    </section>
+
+    <!-- ========== 로비 화면 ========== -->
+    <section id="lobbyScreen" class="screen">
+      <div class="lobby-grid">
+        <div class="card lobby-rooms">
+          <div class="section-head">
+            <h2>📋 공개 방</h2>
+            <button id="openCreateBtn" class="primary-btn small">＋ 방 만들기</button>
+          </div>
+          <div id="roomList" class="room-list"></div>
+
+          <div class="divider"><span>또는</span></div>
+
+          <div class="join-private">
+            <h3>🔒 비공개방 입장</h3>
+            <p class="hint-sm">친구에게 받은 6자리 코드를 입력하세요</p>
+            <div class="code-input-row">
+              <input id="codeInput" class="code-input" placeholder="ABCDEF" maxlength="6" autocomplete="off" />
+              <button id="enterCodeBtn" class="primary-btn">입장</button>
+            </div>
+            <p id="lobbyMsg" class="msg"></p>
+          </div>
+        </div>
+
+        <div class="card chat-card">
+          <div class="section-head">
+            <h2>💬 전체 채팅</h2>
+            <span class="chat-room-label">로비</span>
+          </div>
+          <div id="lobbyChatBox" class="chat-box"></div>
+          <form id="lobbyChatForm" class="chat-form">
+            <input id="lobbyChatInput" type="text" placeholder="메시지를 입력하세요" maxlength="500" autocomplete="off" />
+            <button type="submit" class="primary-btn small">전송</button>
+          </form>
+        </div>
+      </div>
+    </section>
+
+    <!-- ========== 방 만들기 모달 ========== -->
+    <div id="createModal" class="modal">
+      <div class="modal-backdrop"></div>
+      <div class="modal-card">
+        <h2>새 방 만들기</h2>
+        <div class="field">
+          <label for="newRoomName">방 이름</label>
+          <input id="newRoomName" type="text" placeholder="예: 5월 회식" maxlength="30" autocomplete="off" />
+        </div>
+        <div class="visibility-toggle">
+          <label class="vis-option">
+            <input type="radio" name="visibility" value="public" checked />
+            <div>
+              <strong>🌐 공개방</strong>
+              <p>로비 목록에 표시되어 누구나 참여 가능</p>
+            </div>
+          </label>
+          <label class="vis-option">
+            <input type="radio" name="visibility" value="private" />
+            <div>
+              <strong>🔒 비공개방</strong>
+              <p>6자리 코드를 아는 사람만 입장</p>
+            </div>
+          </label>
+        </div>
+        <div class="modal-actions">
+          <button id="cancelCreateBtn" class="ghost-btn">취소</button>
+          <button id="confirmCreateBtn" class="primary-btn">만들기</button>
+        </div>
+        <p id="createMsg" class="msg"></p>
+      </div>
+    </div>
+
+    <!-- ========== 결과 카드 모달 (이미지 다운로드용) ========== -->
+    <div id="cardModal" class="modal">
+      <div class="modal-backdrop"></div>
+      <div class="modal-card">
+        <h2>결과 카드</h2>
+        <p class="hint-sm">이미지로 저장해서 카톡에 붙여넣을 수 있어요</p>
+        <canvas id="resultCanvas" width="800" height="450"></canvas>
+        <div class="modal-actions">
+          <button id="closeCardBtn" class="ghost-btn">닫기</button>
+          <button id="downloadCardBtn" class="primary-btn">📥 다운로드</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ========== 방 화면 ========== -->
+    <section id="roomScreen" class="screen">
+      <div class="room-topbar card">
+        <div class="room-info">
+          <button id="backToLobbyBtn" class="icon-btn">←</button>
+          <div>
+            <div class="room-title-row">
+              <strong id="currentRoom">-</strong>
+              <span id="roomVisibility" class="vis-badge"></span>
+              <span id="hostBadge" class="host-badge" style="display:none;">👑 방장</span>
+            </div>
+            <div class="room-meta">
+              <span class="user">· <span id="currentUser">-</span></span>
+              <span id="codeBadge" class="code-badge" style="display:none;"></span>
+            </div>
+          </div>
+        </div>
+        <div class="topbar-actions">
+          <button id="shareBtn" class="ghost-btn">🔗 링크</button>
+          <button id="cardBtn" class="ghost-btn">🖼️ 카드</button>
+          <button id="icalBtn" class="ghost-btn" style="display:none;">📅 캘린더</button>
+          <button id="deleteRoomBtn" class="ghost-btn danger" style="display:none;">🗑️ 방 삭제</button>
+        </div>
+      </div>
+
+      <!-- 확정 배너 -->
+      <div id="confirmBanner" class="confirm-banner" style="display:none;"></div>
+
+      <div class="room-grid">
+
+        <!-- 달력 -->
+        <div class="card">
+          <div class="calendar-header">
+            <button id="prevMonth" class="nav-btn">‹</button>
+            <h2 id="monthLabel">-</h2>
+            <button id="nextMonth" class="nav-btn">›</button>
+          </div>
+
+          <!-- 빠른 선택 -->
+          <div class="quick-select">
+            <button class="chip-btn" data-quick="weekdays">평일만</button>
+            <button class="chip-btn" data-quick="weekends">주말만</button>
+            <button class="chip-btn" data-quick="all">이번 달 전체</button>
+            <button class="chip-btn" data-quick="clear">초기화</button>
+          </div>
+
+          <div class="weekdays">
+            <span class="sun">일</span><span>월</span><span>화</span><span>수</span><span>목</span><span>금</span><span class="sat">토</span>
+          </div>
+          <div id="calendar" class="calendar"></div>
+          <p class="hint-sm" style="margin-top:12px;text-align:center;">셀 안의 점을 눌러 시간대(오전/오후/저녁)를 개별 선택할 수 있어요</p>
+
+          <div class="actions">
+            <span id="selectedCount" class="count-info">0개 선택됨</span>
+            <button id="saveBtn" class="primary-btn">저장하기</button>
+          </div>
+          <p id="saveMsg" class="msg"></p>
+        </div>
+
+        <!-- 결과 -->
+        <div class="card">
+          <div class="result-header">
+            <h2>📊 결과</h2>
+            <div class="result-status">
+              <span id="liveDot" class="live-dot" title="실시간"></span>
+              <span id="lastUpdated" class="last-updated">-</span>
+            </div>
+          </div>
+          <p class="member-info">참여자 <strong id="memberCount">0</strong>명: <span id="memberList"></span></p>
+          <p id="pendingInfo" class="pending-info" style="display:none;"></p>
+
+          <!-- 탭: 결과 / 참여자 -->
+          <div class="tabs">
+            <button class="tab-btn active" data-tab="ranking">⭐ 순위</button>
+            <button class="tab-btn" data-tab="members">👥 참여자별</button>
+          </div>
+
+          <ul id="resultList" class="result-list tab-panel active"></ul>
+          <div id="memberPanel" class="member-panel tab-panel"></div>
+        </div>
+
+        <!-- 방 채팅 -->
+        <div class="card chat-card room-chat">
+          <div class="section-head">
+            <h2>💬 방 채팅</h2>
+            <span class="chat-room-label" id="chatRoomLabel">-</span>
+          </div>
+          <div id="roomChatBox" class="chat-box"></div>
+          <form id="roomChatForm" class="chat-form">
+            <input id="roomChatInput" type="text" placeholder="메시지... @닉네임 으로 멘션" maxlength="500" autocomplete="off" />
+            <button type="submit" class="primary-btn small">전송</button>
+          </form>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- 이모지 피커 (채팅 메시지 호버 시 표시) -->
+    <div id="emojiPicker" class="emoji-picker">
+      <button data-emoji="👍">👍</button>
+      <button data-emoji="❤️">❤️</button>
+      <button data-emoji="😂">😂</button>
+      <button data-emoji="🎉">🎉</button>
+      <button data-emoji="🔥">🔥</button>
+      <button data-emoji="👀">👀</button>
+    </div>
+
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>

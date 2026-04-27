@@ -1,0 +1,14 @@
+{
+  "name": "matchu",
+  "version": "2.0.0",
+  "description": "맞춰 (Matchu) - 약속 조율 + 채팅",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node server.js"
+  },
+  "dependencies": {
+    "express": "^4.19.2",
+    "ws": "^8.18.0"
+  }
+}

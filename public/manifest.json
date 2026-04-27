@@ -1,0 +1,17 @@
+{
+  "name": "맞춰 · Matchu",
+  "short_name": "맞춰",
+  "description": "함께 비는 그 날을 한눈에 맞춰보세요",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#0a0e1a",
+  "theme_color": "#6366f1",
+  "icons": [
+    {
+      "src": "/icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}
